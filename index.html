@@ -37,15 +37,15 @@
     <span id="score" style="position:fixed;top:0px;right:0px;font-size:50px;color:gold;">0</span>
     <input id="capSize" title="Frame X,Y Size" style="background-color:transparent;position:fixed;bottom:20%;width:85px;left:50%;margin-left:-42px;font-size:50px;color:gold;z-index:10;" type="number" value="96" size="4"/>
     <input id="numberThreshold" name="Change Threshold for Capture" style="background-color:transparent;position:fixed;bottom:20%;width:85px;right:0px;font-size:50px;color:gold;z-index:10;" type="number" value="186" size="4"/>
-    <div style="font-size:50px;color:gold;position:fixed;bottom:20%;left:0px;width:85px;z-index:10;"><input name="Front or Back Camera" id="chkCamera" type="checkbox" onchange="setTimeout(function(){DiffCamEngine.requestWebcam();},1000);"/>F/B</div>
+    <div style="display:none;font-size:50px;color:gold;position:fixed;bottom:20%;left:0px;width:85px;z-index:10;"><input name="Front or Back Camera" id="chkCamera" type="checkbox" onchange="setTimeout(function(){DiffCamEngine.requestWebcam();},1000);"/>F/B</div>
     <div id="divSelect"></div>
     <input id="rangeCapture" min="0" max="0" value="0" type="range" style="position:fixed;top:82%;left:1%;width:98%;"/>	
     <div id="divCapture" style="position:fixed;bottom:1%;height:10%;left:1%;width:98%;overflow:scroll;"></div>
-    <button style="position:fixed; top:15%; right:1%; z-index:1000;" onclick="loadCamera();">Camera</button>
-    <button style="position:fixed; top:25%; right:1%; z-index:1000;" onclick="loadScreen();">Screen</button>
+    <button style="display:none;position:fixed; top:15%; right:1%; z-index:1000;" onclick="loadCamera();">Camera</button>
+    <button style="display:none;position:fixed; top:25%; right:1%; z-index:1000;" onclick="loadScreen();">Screen</button>
     <input type="button" value="Clear" style="position:fixed; top:35%; right:1%; z-index:1000;" onclick="postClear();"/>
-    <input type="button" value="Save" style="position:fixed; top:45%; right:1%; z-index:1000;" onclick="postScreen(true);"/>
-    <input id="inputRefresh" type="button" value="Refresh" style="position:fixed; top:55%; right:1%; z-index:1000;" onclick="document.location=document.location.toString().substring(0,document.location.toString().lastIndexOf('&rand'))+'&rand='+Math.random();"/>
+    <input type="button" value="Save" style="display:none;position:fixed; top:45%; right:1%; z-index:1000;" onclick="postScreen(true);"/>
+    <input id="inputRefresh" type="button" value="Refresh" style="display:none;position:fixed; top:55%; right:1%; z-index:1000;" onclick="document.location=document.location.toString().substring(0,document.location.toString().lastIndexOf('&rand'))+'&rand='+Math.random();"/>
     <script>
 var video = document.getElementById('video');
 var canvas = document.getElementById('motion');
@@ -64,6 +64,7 @@ var interval=setInterval(function(){divTitle.style.opacity=titleOpacity;titleOpa
 var cameras=[];
 var divsel=document.getElementById('divSelect');
 function fetchScreens(){
+return;
 try{
 fetch('/screens.html').then(function(response){
 try{
@@ -137,6 +138,12 @@ if(queryStringParams(window.location.search)["postcount"]!=undefined) {
 }
 
 function postClear(){
+if('anything'==prompt('Challenge')){
+	divsel.innerHTML='';
+	    localStorage.clear();
+	    divCapture.innerHTML='';
+}
+return;
     var xhr=new XMLHttpRequest();
     xhr.onreadystatechange=function(){
         if(xhr.readyState==XMLHttpRequest.DONE){
@@ -171,6 +178,7 @@ divsel.innerHTML='';
 	localStorage['screenURL']=screenURL;
 }
 function postScreen(force){
+//return;
 if(!force && capCount==0) {return;}
     var xhr=new XMLHttpRequest();
     xhr.onreadystatechange=function(){
@@ -183,21 +191,23 @@ if(!force && capCount==0) {return;}
             }
         }
     };
-    var svr='localhost';
+    var svr='127.0.0.1';
     if(queryStringParams(window.location.search)["server"]!=undefined) {
 	svr=queryStringParams(window.location.search)["server"];
     }
-    var port='1234';
+    var port='8080';
     if(queryStringParams(window.location.search)["port"]!=undefined) {
 	port=queryStringParams(window.location.search)["port"];
     }
-    xhr.open('POST','/cgi-bin/post.sh',true);
+//    xhr.open('POST','/cgi-bin/post.sh',true);
     xhr.send(btoa(document.documentElement.outerHTML));
 	    capCount=0;
 	    document.getElementById('divCount').innerHTML=capCount;
 	    rangeCap.setAttribute('max',capCount-1);
 	    rangeCap.setAttribute('value',capCount-1);
+//alert(	    divCapture.innerHTML);
 	    divCapture.innerHTML='';
+
 	var screenURL=localStorage['screenURL'];
 	var cameraURL=localStorage['cameraURL'];
 	    localStorage.clear();
